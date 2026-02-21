@@ -370,10 +370,11 @@ const Exams = () => {
       {/* Delete Confirmation */}
       {deleteTarget && (
         <ConfirmModal
+          isOpen={true}
           title="Delete Exam"
           message={`Are you sure you want to delete "${deleteTarget.name}"? This will also remove all associated grade submissions.`}
           onConfirm={handleDelete}
-          onCancel={() => setDeleteTarget(null)}
+          onClose={() => setDeleteTarget(null)}
         />
       )}
     </div>

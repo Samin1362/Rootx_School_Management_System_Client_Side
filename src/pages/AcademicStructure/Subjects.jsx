@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useNotification } from "../../contexts/NotificationContext";
 import ConfirmModal from "../../components/ConfirmModal";
@@ -9,6 +10,7 @@ import { FaPlus, FaEdit, FaTrash, FaBookOpen } from "react-icons/fa";
 const Subjects = () => {
   const axiosSecure = useAxiosSecure();
   const { success, error: showError } = useNotification();
+  const navigate = useNavigate();
 
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -137,7 +139,10 @@ const Subjects = () => {
               <option key={cls._id} value={cls._id}>{cls.name}</option>
             ))}
           </select>
-          <button onClick={openCreateModal} className="btn btn-primary btn-sm gap-2">
+          <button
+            onClick={() => navigate("/dashboard/subjects/add")}
+            className="btn btn-primary btn-sm gap-2"
+          >
             <FaPlus /> Add Subject
           </button>
         </div>
@@ -148,7 +153,7 @@ const Subjects = () => {
           icon={FaBookOpen}
           title="No subjects yet"
           message="Create subjects and assign them to classes and teachers."
-          action={openCreateModal}
+          action={() => navigate("/dashboard/subjects/add")}
           actionLabel="Create Subject"
         />
       ) : (

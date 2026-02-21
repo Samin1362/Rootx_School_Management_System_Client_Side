@@ -1,9 +1,12 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import App from "./App";
 import AuthLayout from "./layouts/AuthLayout";
+import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
 import SuperAdminDashboardLayout from "./layouts/SuperAdminDashboardLayout";
 import Login from "./pages/Auth/Login";
+import HomePage from "./pages/Landing/HomePage";
+import ContactPage from "./pages/Landing/ContactPage";
 import Register from "./pages/Auth/Register";
 import OrganizationSignup from "./pages/Organization/OrganizationSignup";
 import SubscriptionPlans from "./pages/Subscription/SubscriptionPlans";
@@ -16,8 +19,11 @@ import Overview from "./pages/Dashboard/Overview";
 
 // Phase 2 – Academic Structure
 import Classes from "./pages/AcademicStructure/Classes";
+import AddClass from "./pages/AcademicStructure/AddClass";
 import Sections from "./pages/AcademicStructure/Sections";
+import AddSection from "./pages/AcademicStructure/AddSection";
 import Subjects from "./pages/AcademicStructure/Subjects";
+import AddSubject from "./pages/AcademicStructure/AddSubject";
 
 // Phase 2 – Student Management
 import Students from "./pages/StudentManagement/Students";
@@ -98,9 +104,19 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
+      // Public routes — landing page and contact page
       {
-        index: true,
-        element: <Navigate to="/login" replace />,
+        element: <PublicLayout />,
+        children: [
+          {
+            index: true,
+            element: <HomePage />,
+          },
+          {
+            path: "/contact",
+            element: <ContactPage />,
+          },
+        ],
       },
       {
         element: <AuthLayout />,
@@ -175,12 +191,24 @@ const router = createBrowserRouter([
             element: <Classes />,
           },
           {
+            path: "classes/add",
+            element: <AddClass />,
+          },
+          {
             path: "sections",
             element: <Sections />,
           },
           {
+            path: "sections/add",
+            element: <AddSection />,
+          },
+          {
             path: "subjects",
             element: <Subjects />,
+          },
+          {
+            path: "subjects/add",
+            element: <AddSubject />,
           },
           // Phase 3 – Attendance Management
           {
