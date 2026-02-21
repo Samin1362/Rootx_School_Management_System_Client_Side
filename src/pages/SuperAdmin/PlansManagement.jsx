@@ -27,6 +27,7 @@ const PlansManagement = () => {
   const [formData, setFormData] = useState({
     tier: "",
     name: "",
+    description: "",
     monthlyPrice: "",
     yearlyPrice: "",
     maxStudents: "",
@@ -60,8 +61,8 @@ const PlansManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.tier || !formData.name) {
-      showError("Tier and name are required");
+    if (!formData.tier || !formData.name || !formData.description) {
+      showError("Tier, name, and description are required");
       return;
     }
 
@@ -70,6 +71,7 @@ const PlansManagement = () => {
       const payload = {
         tier: formData.tier,
         name: formData.name,
+        description: formData.description,
         monthlyPrice: parseFloat(formData.monthlyPrice) || 0,
         yearlyPrice: parseFloat(formData.yearlyPrice) || 0,
         limits: {
@@ -97,6 +99,7 @@ const PlansManagement = () => {
       setFormData({
         tier: "",
         name: "",
+        description: "",
         monthlyPrice: "",
         yearlyPrice: "",
         maxStudents: "",
@@ -117,6 +120,7 @@ const PlansManagement = () => {
     setFormData({
       tier: plan.tier,
       name: plan.name,
+      description: plan.description || "",
       monthlyPrice: plan.monthlyPrice.toString(),
       yearlyPrice: plan.yearlyPrice.toString(),
       maxStudents: plan.limits.maxStudents.toString(),
@@ -178,6 +182,7 @@ const PlansManagement = () => {
               setFormData({
                 tier: "",
                 name: "",
+                description: "",
                 monthlyPrice: "",
                 yearlyPrice: "",
                 maxStudents: "",
@@ -324,6 +329,20 @@ const PlansManagement = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Description *</span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered w-full resize-none"
+                  placeholder="e.g., For small schools getting started"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={2}
+                  required
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
