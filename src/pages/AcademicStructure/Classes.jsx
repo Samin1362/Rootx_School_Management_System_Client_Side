@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import { useNotification } from "../../contexts/NotificationContext";
@@ -11,6 +12,7 @@ const Classes = () => {
   const axiosSecure = useAxiosSecure();
   const { organizationId } = useAuth();
   const { success, error: showError } = useNotification();
+  const navigate = useNavigate();
 
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -138,7 +140,7 @@ const Classes = () => {
             </div>
           </div>
           <button
-            onClick={openCreateModal}
+            onClick={() => navigate("/dashboard/classes/add")}
             className="btn btn-sm gap-2 bg-white text-primary hover:bg-white/90 border-none shadow-lg hover:scale-105 transition-all duration-300"
           >
             <FaPlus /> Add Class
@@ -152,7 +154,7 @@ const Classes = () => {
           icon={FaLayerGroup}
           title="No classes yet"
           message="Create your first class to get started with academic structure."
-          action={openCreateModal}
+          action={() => navigate("/dashboard/classes/add")}
           actionLabel="Create Class"
         />
       ) : (

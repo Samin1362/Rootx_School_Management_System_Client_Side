@@ -322,7 +322,7 @@ const DashboardLayout = () => {
         <button
           className={`is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-3.5 w-full px-4 py-3.5 rounded-xl transition-all duration-300 active:scale-95 group ${
             isRouteActive(item.path)
-              ? "bg-gradient-to-r from-primary to-primary/80 text-primary-content font-semibold shadow-lg shadow-primary/20"
+              ? "bg-linear-to-r from-primary to-primary/80 text-primary-content font-semibold shadow-lg shadow-primary/20"
               : "text-base-content/70 hover:bg-gradient-to-r hover:from-primary/15 hover:to-primary/5 hover:text-primary hover:shadow-md"
           }`}
           data-tip={item.label}
@@ -453,8 +453,8 @@ const DashboardLayout = () => {
                         <button
                           className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg transition-all duration-300 group ${
                             isRouteActive(item.path)
-                              ? "bg-gradient-to-r from-primary to-primary/80 text-primary-content font-semibold shadow-md"
-                              : "hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent hover:text-primary text-base-content/70 hover:pl-4"
+                              ? "bg-linear-to-r from-primary to-primary/80 text-primary-content font-semibold shadow-md"
+                              : "hover:bg-linear-to-r hover:from-primary/10 hover:to-transparent hover:text-primary text-base-content/70 hover:pl-4"
                           }`}
                         >
                           <item.icon className={`text-base shrink-0 transition-transform duration-300 ${
