@@ -10,6 +10,7 @@ import ContactPage from "./pages/Landing/ContactPage";
 import Register from "./pages/Auth/Register";
 import OrganizationSignup from "./pages/Organization/OrganizationSignup";
 import SubscriptionPlans from "./pages/Subscription/SubscriptionPlans";
+import MySubscription from "./pages/Subscription/MySubscription";
 import WaitingForOrganization from "./pages/WaitingForOrganization";
 import OrganizationSuspended from "./pages/OrganizationSuspended";
 import ErrorPage from "./pages/ErrorPage";
@@ -356,6 +357,11 @@ const router = createBrowserRouter([
           {
             path: "settings",
             element: <OrganizationSettings />,
+          },
+          // Subscription management (org_owner)
+          {
+            path: "subscription",
+            element: <MySubscription />,
           },
         ],
       },
