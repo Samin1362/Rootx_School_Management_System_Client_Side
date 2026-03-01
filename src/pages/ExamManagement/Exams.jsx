@@ -11,13 +11,12 @@ import { useNavigate } from "react-router";
 const Exams = () => {
   const axiosSecure = useAxiosSecure();
   const { userRole } = useAuth();
-  const { success, error: showError } = useNotification();
+  const { success: showSuccess, error: showError } = useNotification();
   const navigate = useNavigate();
 
   const [exams, setExams] = useState([]);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
 
   // Filters
   const [filterClass, setFilterClass] = useState("");
@@ -26,17 +25,8 @@ const Exams = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, pages: 0 });
 
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingExam, setEditingExam] = useState(null);
+  // Delete modal
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [form, setForm] = useState({
-    name: "",
-    classId: "",
-    academicYear: new Date().getFullYear().toString(),
-    startDate: "",
-    endDate: "",
-  });
 
   useEffect(() => {
     fetchClasses();
@@ -79,65 +69,12 @@ const Exams = () => {
     }
   };
 
-  const resetForm = () => {
-    setForm({
-      name: "",
-      classId: "",
-      academicYear: new Date().getFullYear().toString(),
-      startDate: "",
-      endDate: "",
-    });
-    setEditingExam(null);
-  };
-
-  const openCreate = () => {
-    resetForm();
-    setModalOpen(true);
-  };
-
-  const openEdit = (exam) => {
-    setEditingExam(exam);
-    setForm({
-      name: exam.name,
-      classId: String(exam.classId),
-      academicYear: exam.academicYear,
-      startDate: new Date(exam.startDate).toISOString().split("T")[0],
-      endDate: new Date(exam.endDate).toISOString().split("T")[0],
-    });
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      if (editingExam) {
-        const res = await axiosSecure.patch(`/exams/${editingExam._id}`, form);
-        if (res.data.success) {
-          success("Exam updated successfully");
-        }
-      } else {
-        const res = await axiosSecure.post("/exams", form);
-        if (res.data.success) {
-          success("Exam created successfully");
-        }
-      }
-      setModalOpen(false);
-      resetForm();
-      fetchExams();
-    } catch (err) {
-      showError(err.response?.data?.message || "Failed to save exam");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
       const res = await axiosSecure.delete(`/exams/${deleteTarget._id}`);
       if (res.data.success) {
-        success(res.data.message);
+        showSuccess(res.data.message);
         fetchExams();
       }
     } catch (err) {
@@ -169,7 +106,7 @@ const Exams = () => {
           </p>
         </div>
         {["org_owner", "admin", "teacher"].includes(userRole) && (
-          <button className="btn btn-primary btn-sm" onClick={openCreate}>
+          <button className="btn btn-primary btn-sm" onClick={() => navigate("/dashboard/exams/add")}>
             <FaPlus className="mr-1" /> Create Exam
           </button>
         )}
@@ -253,7 +190,7 @@ const Exams = () => {
                         </button>
                         {["org_owner", "admin"].includes(userRole) && (
                           <>
-                            <button className="btn btn-ghost btn-xs" onClick={() => openEdit(exam)} title="Edit">
+                            <button className="btn btn-ghost btn-xs" onClick={() => navigate(`/dashboard/exams/edit/${exam._id}`)} title="Edit">
                               <FaEdit />
                             </button>
                             <button className="btn btn-ghost btn-xs text-error" onClick={() => setDeleteTarget(exam)} title="Delete">
@@ -284,87 +221,6 @@ const Exams = () => {
             Next
           </button>
         </div>
-      )}
-
-      {/* Create/Edit Modal */}
-      {modalOpen && (
-        <dialog className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">
-              {editingExam ? "Edit Exam" : "Create Exam"}
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="form-control">
-                <label className="label"><span className="label-text">Exam Name</span></label>
-                <input
-                  type="text"
-                  className="input input-bordered"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g., 1st Term, Midterm, Final"
-                  required
-                />
-              </div>
-              {!editingExam && (
-                <div className="form-control">
-                  <label className="label"><span className="label-text">Class</span></label>
-                  <select
-                    className="select select-bordered"
-                    value={form.classId}
-                    onChange={(e) => setForm({ ...form, classId: e.target.value })}
-                    required
-                  >
-                    <option value="">Select Class</option>
-                    {classes.map((c) => (
-                      <option key={c._id} value={c._id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              <div className="form-control">
-                <label className="label"><span className="label-text">Academic Year</span></label>
-                <input
-                  type="text"
-                  className="input input-bordered"
-                  value={form.academicYear}
-                  onChange={(e) => setForm({ ...form, academicYear: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-control">
-                  <label className="label"><span className="label-text">Start Date</span></label>
-                  <input
-                    type="date"
-                    className="input input-bordered"
-                    value={form.startDate}
-                    onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label"><span className="label-text">End Date</span></label>
-                  <input
-                    type="date"
-                    className="input input-bordered"
-                    value={form.endDate}
-                    onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="modal-action">
-                <button type="button" className="btn" onClick={() => { setModalOpen(false); resetForm(); }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? <span className="loading loading-spinner loading-sm" /> : editingExam ? "Update" : "Create"}
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="modal-backdrop" onClick={() => { setModalOpen(false); resetForm(); }} />
-        </dialog>
       )}
 
       {/* Delete Confirmation */}

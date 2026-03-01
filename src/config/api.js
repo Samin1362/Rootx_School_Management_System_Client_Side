@@ -10,7 +10,7 @@ const getApiBaseUrl = () => {
     return "http://localhost:3000";
   }
 
-  return "https://rootx-school-ms-server.vercel.app";
+  return "https://rootxschoolmsserverside.vercel.app";
 };
 
 export const API_BASE_URL = getApiBaseUrl();
