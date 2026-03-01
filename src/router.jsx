@@ -48,6 +48,7 @@ import AttendanceReports from "./pages/AttendanceManagement/AttendanceReports";
 // Phase 4 – Exam Management
 import Exams from "./pages/ExamManagement/Exams";
 import ExamDetails from "./pages/ExamManagement/ExamDetails";
+import AddExam from "./pages/ExamManagement/AddExam";
 
 // Phase 4 – Grade Management
 import GradeEntry from "./pages/GradeManagement/GradeEntry";
@@ -96,6 +97,7 @@ import SubscriptionsManagement from "./pages/SuperAdmin/SubscriptionsManagement"
 import SubscriptionRequests from "./pages/SuperAdmin/SubscriptionRequests";
 import ReactivationRequests from "./pages/SuperAdmin/ReactivationRequests";
 import PlansManagement from "./pages/SuperAdmin/PlansManagement";
+import CreatePlan from "./pages/SuperAdmin/CreatePlan";
 import PlatformSettings from "./pages/SuperAdmin/PlatformSettings";
 import PlatformReports from "./pages/SuperAdmin/PlatformReports";
 
@@ -228,6 +230,14 @@ const router = createBrowserRouter([
           {
             path: "exams",
             element: <Exams />,
+          },
+          {
+            path: "exams/add",
+            element: <AddExam />,
+          },
+          {
+            path: "exams/edit/:examId",
+            element: <AddExam />,
           },
           {
             path: "exams/:examId",
@@ -405,6 +415,14 @@ const router = createBrowserRouter([
           {
             path: "plans",
             element: <PlansManagement />,
+          },
+          {
+            path: "plans/create",
+            element: <CreatePlan />,
+          },
+          {
+            path: "plans/edit/:planId",
+            element: <CreatePlan />,
           },
           {
             path: "settings",

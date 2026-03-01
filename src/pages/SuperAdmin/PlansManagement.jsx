@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useNotification } from "../../contexts/NotificationContext";
 import ConfirmModal from "../../components/ConfirmModal";
@@ -15,26 +16,11 @@ import {
 
 const PlansManagement = () => {
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
   const { success, error: showError } = useNotification();
 
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-
-  // Create/Edit Modal
-  const [showModal, setShowModal] = useState(false);
-  const [editingPlan, setEditingPlan] = useState(null);
-  const [formData, setFormData] = useState({
-    tier: "",
-    name: "",
-    description: "",
-    monthlyPrice: "",
-    yearlyPrice: "",
-    maxStudents: "",
-    maxClasses: "",
-    maxTeachers: "",
-    isActive: true,
-  });
 
   // Delete Modal
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -58,78 +44,6 @@ const PlansManagement = () => {
     fetchPlans();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.tier || !formData.name || !formData.description) {
-      showError("Tier, name, and description are required");
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      const payload = {
-        tier: formData.tier,
-        name: formData.name,
-        description: formData.description,
-        monthlyPrice: parseFloat(formData.monthlyPrice) || 0,
-        yearlyPrice: parseFloat(formData.yearlyPrice) || 0,
-        limits: {
-          maxStudents: parseInt(formData.maxStudents) || 0,
-          maxClasses: parseInt(formData.maxClasses) || 0,
-          maxTeachers: parseInt(formData.maxTeachers) || 0,
-        },
-        isActive: formData.isActive,
-      };
-
-      if (editingPlan) {
-        const res = await axiosSecure.patch(`/super-admin/plans/${editingPlan._id}`, payload);
-        if (res.data.success) {
-          success(res.data.message || "Plan updated successfully");
-        }
-      } else {
-        const res = await axiosSecure.post("/super-admin/plans", payload);
-        if (res.data.success) {
-          success(res.data.message || "Plan created successfully");
-        }
-      }
-
-      setShowModal(false);
-      setEditingPlan(null);
-      setFormData({
-        tier: "",
-        name: "",
-        description: "",
-        monthlyPrice: "",
-        yearlyPrice: "",
-        maxStudents: "",
-        maxClasses: "",
-        maxTeachers: "",
-        isActive: true,
-      });
-      fetchPlans();
-    } catch (error) {
-      showError(error.response?.data?.message || "Failed to save plan");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleEdit = (plan) => {
-    setEditingPlan(plan);
-    setFormData({
-      tier: plan.tier,
-      name: plan.name,
-      description: plan.description || "",
-      monthlyPrice: plan.monthlyPrice.toString(),
-      yearlyPrice: plan.yearlyPrice.toString(),
-      maxStudents: plan.limits.maxStudents.toString(),
-      maxClasses: plan.limits.maxClasses.toString(),
-      maxTeachers: plan.limits.maxTeachers.toString(),
-      isActive: plan.isActive,
-    });
-    setShowModal(true);
-  };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -177,21 +91,7 @@ const PlansManagement = () => {
             </div>
           </div>
           <button
-            onClick={() => {
-              setEditingPlan(null);
-              setFormData({
-                tier: "",
-                name: "",
-                description: "",
-                monthlyPrice: "",
-                yearlyPrice: "",
-                maxStudents: "",
-                maxClasses: "",
-                maxTeachers: "",
-                isActive: true,
-              });
-              setShowModal(true);
-            }}
+            onClick={() => navigate("/dashboard/super-admin/plans/create")}
             className="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-none"
           >
             <FaPlus /> Create Plan
@@ -207,7 +107,7 @@ const PlansManagement = () => {
           icon={FaCrown}
           title="No Plans Found"
           message="Create your first subscription plan to get started."
-          action={() => setShowModal(true)}
+          action={() => navigate("/dashboard/super-admin/plans/create")}
           actionLabel="Create Plan"
         />
       ) : (
@@ -266,7 +166,7 @@ const PlansManagement = () => {
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleEdit(plan)}
+                  onClick={() => navigate(`/dashboard/super-admin/plans/edit/${plan._id}`)}
                   className="btn btn-sm btn-primary flex-1"
                 >
                   <FaEdit /> Edit
@@ -281,186 +181,6 @@ const PlansManagement = () => {
             </div>
           ))}
         </div>
-      )}
-
-      {/* Create/Edit Modal */}
-      {showModal && (
-        <dialog className="modal modal-open">
-          <div className="modal-box max-w-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <FaCrown className="text-primary" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg text-base-content">
-                  {editingPlan ? "Edit Plan" : "Create New Plan"}
-                </h3>
-                <p className="text-xs text-base-content/50">
-                  {editingPlan ? "Update plan details" : "Add a new subscription plan"}
-                </p>
-              </div>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Tier *</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="input input-bordered w-full"
-                    placeholder="e.g., basic, professional"
-                    value={formData.tier}
-                    onChange={(e) => setFormData({ ...formData, tier: e.target.value.toLowerCase() })}
-                    required
-                    disabled={!!editingPlan}
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Name *</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="input input-bordered w-full"
-                    placeholder="e.g., Basic Plan"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Description *</span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered w-full resize-none"
-                  placeholder="e.g., For small schools getting started"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={2}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Monthly Price</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0"
-                    value={formData.monthlyPrice}
-                    onChange={(e) => setFormData({ ...formData, monthlyPrice: e.target.value })}
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Yearly Price</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0"
-                    value={formData.yearlyPrice}
-                    onChange={(e) => setFormData({ ...formData, yearlyPrice: e.target.value })}
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-
-              <div className="divider">Limits</div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Max Students</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0"
-                    value={formData.maxStudents}
-                    onChange={(e) => setFormData({ ...formData, maxStudents: e.target.value })}
-                    min="0"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Max Classes</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0"
-                    value={formData.maxClasses}
-                    onChange={(e) => setFormData({ ...formData, maxClasses: e.target.value })}
-                    min="0"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Max Teachers</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0"
-                    value={formData.maxTeachers}
-                    onChange={(e) => setFormData({ ...formData, maxTeachers: e.target.value })}
-                    min="0"
-                  />
-                </div>
-              </div>
-
-              <div className="form-control">
-                <label className="label cursor-pointer justify-start gap-3">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-primary"
-                    checked={formData.isActive}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  />
-                  <span className="label-text">Active (available for subscription)</span>
-                </label>
-              </div>
-
-              <div className="modal-action">
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => {
-                    setShowModal(false);
-                    setEditingPlan(null);
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={actionLoading}
-                >
-                  {actionLoading ? (
-                    <span className="loading loading-spinner loading-sm" />
-                  ) : editingPlan ? (
-                    "Update Plan"
-                  ) : (
-                    "Create Plan"
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="modal-backdrop" onClick={() => setShowModal(false)} />
-        </dialog>
       )}
 
       {/* Delete Confirmation */}
